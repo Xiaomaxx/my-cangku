@@ -1,0 +1,29 @@
+name: Mirror EGO LITE to Gitee
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mirror-ego-lite-to-gitee
+  cancel-in-progress: true
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Push ego-lite branches and tags to Gitee
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          set -euo pipefail
+          git clone --bare https://github.com/Xiaomaxx/ego-lite.git repo.git
+          cd repo.git
+          git push --prune --force \
+            "https://oauth2:${GITEE_TOKEN}@gitee.com/the-heartbeat-of-the-earth/marunzhong.git" \
+            "+refs/heads/*:refs/heads/mirror/Xiaomaxx__ego-lite/*" \
+            "+refs/tags/*:refs/tags/mirror/Xiaomaxx__ego-lite/*"
