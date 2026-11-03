@@ -1,0 +1,31 @@
+name: Mirror to Gitee
+
+on:
+  push:
+  delete:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mirror-to-gitee
+  cancel-in-progress: true
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Push branches and tags to Gitee
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          set -euo pipefail
+          git clone --bare \
+            "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" \
+            repo.git
+          cd repo.git
+          git push --prune --force \
+            "https://oauth2:${GITEE_TOKEN}@gitee.com/the-heartbeat-of-the-earth/marunzhong.git" \
+            "+refs/heads/*:refs/heads/mirror/Xiaomaxx__my-cangku/*" \
+            "+refs/tags/*:refs/tags/mirror/Xiaomaxx__my-cangku/*"
